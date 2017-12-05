@@ -71,3 +71,6 @@ def to_plane():
     print('Distance: ', distance)
     print('Normal: ', normal)
     return jsonify(distance=distance,normal=normal) 
+
+if __name__ == '__main__':
+  app.run()
