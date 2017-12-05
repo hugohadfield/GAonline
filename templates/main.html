@@ -16,7 +16,8 @@
 
 
 <textarea id="myTextarea" rows="30" cols="50" style="position: fixed; top: 0; right: 0; border: 0; resize: none;" >
--(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345)
+DrawSphere(-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345));
+DrawPlane((0.57735^e1234) + (0.57735^e1235) - (0.57735^e1245) + (0.57735^e1345) - (0.57735^e2345));
 </textarea>
 
 
@@ -68,8 +69,28 @@ function parseMultivector(str){
             }
         }
     }
-    console.log(present_blades)
     return present_blades
+}
+
+function callFunction(funcName,mvArg,scene){
+    present_blades = parseMultivector(mvArg);
+    window[funcName](present_blades,scene);
+}
+
+
+// Regex tha extracts the functions with their arguments
+var functionRegex = /\w+\(.+\)/g;
+
+function parseScriptToFunctions(str,scene){
+    var myStringArray = str.match(functionRegex);
+    for (var i = 0; i < myStringArray.length; i++) {
+        var thisFunctionString = myStringArray[i];
+        var funcName = thisFunctionString.split(/\(/,1)[0];
+        console.log(funcName);
+        var mvArg = thisFunctionString.slice(funcName.length+1,-1);
+        console.log(mvArg);
+        callFunction(funcName,mvArg,scene);
+    }
 }
 
 function get_sphere(present_blades){
@@ -80,7 +101,13 @@ function get_sphere(present_blades){
             });
 }
 
-
+function get_plane(present_blades){
+    return $.ajax({
+                url : "to_plane/",
+                type : "POST",
+                data : { 'present_blades' : JSON.stringify(present_blades) } ,
+            });
+}
 
 
 
@@ -114,6 +141,39 @@ function buildAxes( length ) {
     return axes;
 }
 
+function DrawSphere(present_blades,scene){
+    // Get the sphere parameters and draw it on return
+    get_sphere(present_blades).success(function (returned_data) {
+        console.log(returned_data);
+        var centre = returned_data.centre;
+        var radius = returned_data.radius;
+        var geometry = new THREE.SphereGeometry( radius, 32, 32 );
+        var material = new THREE.MeshBasicMaterial( {color: 0xff0000, wireframe: true} );
+        var sphere = new THREE.Mesh( geometry, material );
+        sphere.position.set(centre[0],centre[1],centre[2])
+        scene.add(sphere);
+    });
+}
+
+function DrawPlane(present_blades,scene){
+    // Get the sphere parameters and draw it on return
+    get_plane(present_blades).success(function (returned_data) {
+        console.log(returned_data);
+        var distance = returned_data.distance;
+        var normal = returned_data.normal;
+        var position = [normal[0]*distance,normal[1]*distance,normal[2]*distance];
+        
+        // Add a floor
+        var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
+        var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true} );
+        var plane = new THREE.Mesh( geometry, material );
+        plane.material.side = THREE.DoubleSide;
+        plane.lookAt(normal[0],normal[1],normal[2]);
+        plane.position.set(position[0],position[1],position[2]);
+        scene.add( plane );
+    });
+}
+
 // Set up the scene and window size
 var scene = new THREE.Scene();
 var canvas_width = window.innerWidth*0.75
@@ -143,21 +203,9 @@ floor.material.side = THREE.DoubleSide;
 floor.rotation.x = 3.14/2.0;
 scene.add( floor );
 
-// Input string
+// Get the input string
 var input_str = document.getElementById("myTextarea").value;
-present_blades = parseMultivector(input_str);
-
-// Get the sphere parameters and draw it on return
-get_sphere(present_blades).success(function (returned_data) {
-    console.log(returned_data);
-    var centre = returned_data.centre;
-    var radius = returned_data.radius;
-    var geometry = new THREE.SphereGeometry( radius, 32, 32 );
-    var material = new THREE.MeshBasicMaterial( {color: 0xff0000, wireframe: true} );
-    var sphere = new THREE.Mesh( geometry, material );
-    sphere.position.set(centre[0],centre[1],centre[2])
-    scene.add(sphere);
-});
+parseScriptToFunctions(input_str,scene)
 
 
 // Animate the scene
