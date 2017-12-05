@@ -13,48 +13,164 @@
 
 
 <body>
-    <script src="static/GAparse.js"></script>
+
+
+<textarea id="myTextarea" rows="30" cols="50" style="position: fixed; top: 0; right: 0; border: 0; resize: none;" >
+-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345)
+</textarea>
+
+
+
     <script src="static/three.js"></script>
+    <script src="static/OrbitControls.js"></script>
 
     <script>
-        var scene = new THREE.Scene();
-        var canvas_width = window.innerWidth*0.75
-        var canvas_height = window.innerHeight
+        
+/* 
+This section of the code deals with parseing text input from the user
+*/
 
-        var camera = new THREE.PerspectiveCamera( 75, canvas_width/canvas_height, 0.1, 1000 );
+// All 4,1 canonical blade strings
+var blades = {"e1":1,"e2":2,"e3":3,"e4":4,"e5":5,
+"e12":6,"e13":7,"e14":8,"e15":9,"e23":10,"e24":11,"e25":12,"e34":13,"e35":14,"e45":15,
+"e123":16,"e124":17,"e125":18,"e134":19,"e135":20,"e145":21,"e234":22,"e235":23,"e245":24,"e345":25,
+"e1234":26,"e1235":27,"e1245":28,"e1345":29,"e2345":30,"e12345":31};
 
-        var renderer = new THREE.WebGLRenderer();
-        renderer.setSize( canvas_width, canvas_height);
-        document.body.appendChild( renderer.domElement );
+// Regex that extract the blades from the input string
+var bladeRegex = /((^|\s)-?\s?\d+(\.\d+)?)\s|(-\s?\d+(\.\d+)?\^e\d+(\s|$))|((^|\+)\s?\d+(\.\d+)?\^e\d+(\s|$))/g;
 
-        var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-        var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-        var cube = new THREE.Mesh( geometry, material );
-        scene.add( cube );
+function parseMultivector(str){
 
-        camera.position.z = 5;
+    // Split the string
+    str = str.replace(/[()]/g, "");
+    var myStringArray = str.match(bladeRegex);
 
-        var animate = function () {
-            requestAnimationFrame( animate );
+    // Now iterate over the array and extract the information
+    var present_blades = {}
+    for (var i = 0; i < myStringArray.length; i++) {
+        // Trim the whitespace
+        thisString = myStringArray[i].trim();
+        // Split on the ^ symbol
+        var stuff = thisString.split("^");
+        //
+        if (stuff.length === 2){
+            // Extract the value of the blade and the index of the blade
+            var blade_val = parseFloat(stuff[0].replace(/ /g,''));
+            blade_index = blades[stuff[1].replace(/ /g,'')]
+            present_blades[blade_index] = blade_val;
+        }
+        else{
+            if(stuff.length === 1){
+                // Extract the value of the scalar
+                var blade_val = parseFloat(stuff[0].replace(/ /g,''));
+                var blade_index = 0;
+                present_blades[blade_index] = blade_val;
+            }
+        }
+    }
+    console.log(present_blades)
+    return present_blades
+}
 
-            cube.rotation.x += 0.1;
-            cube.rotation.y += 0.1;
+function get_sphere(present_blades){
+    return $.ajax({
+                url : "to_sphere/",
+                type : "POST",
+                data : { 'present_blades' : JSON.stringify(present_blades) } ,
+            });
+}
 
-            renderer.render(scene, camera);
-        };
 
-        animate();
+
+
+
+/*
+This section creates the scene and axes
+*/
+
+function buildAxis( src, dst, colorHex, dashed ) {
+    var geom = new THREE.Geometry(),
+        mat;
+    if(dashed) {
+            mat = new THREE.LineDashedMaterial({ linewidth: 3, color: colorHex, dashSize: 3, gapSize: 3 });
+    } else {
+            mat = new THREE.LineBasicMaterial({ linewidth: 3, color: colorHex, transparent: true, opacity:0.2  });
+    }
+    geom.vertices.push( src.clone() );
+    geom.vertices.push( dst.clone() );
+    geom.computeLineDistances(); // This one is SUPER important, otherwise dashed lines will appear as simple plain lines
+    var axis = new THREE.Line( geom, mat, THREE.LinePieces );
+    return axis;
+}
+
+function buildAxes( length ) {
+    var axes = new THREE.Object3D();
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( length, 0, 0 ), 0xFF0000, false ) ); // +X
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( -length, 0, 0 ), 0xFF0000, false) ); // -X
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, length, 0 ), 0x00FF00, false ) ); // +Y
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, -length, 0 ), 0x00FF00, false ) ); // -Y
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, length ), 0x0000FF, false ) ); // +Z
+    axes.add( buildAxis( new THREE.Vector3( 0, 0, 0 ), new THREE.Vector3( 0, 0, -length ), 0x0000FF, false ) ); // -Z
+    return axes;
+}
+
+// Set up the scene and window size
+var scene = new THREE.Scene();
+var canvas_width = window.innerWidth*0.75
+var canvas_height = window.innerHeight
+
+// Create a camera object
+var camera = new THREE.PerspectiveCamera( 75, canvas_width/canvas_height, 0.1, 1000 );
+
+// Set up orbit controls
+var controls = new THREE.OrbitControls( camera );
+camera.position.set( 0, 5, 5 );
+controls.update();
+
+// Create a renderer and add it to the DOM
+var renderer = new THREE.WebGLRenderer({ alpha: true });
+renderer.setSize( canvas_width, canvas_height);
+document.body.appendChild( renderer.domElement );
+
+// Build coordinate axes
+axes = buildAxes( 1000 );
+scene.add(axes);
+// Add a floor
+var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
+var material = new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true, transparent: true, opacity:0.1 } );
+var floor = new THREE.Mesh( geometry, material );
+floor.material.side = THREE.DoubleSide;
+floor.rotation.x = 3.14/2.0;
+scene.add( floor );
+
+// Input string
+var input_str = document.getElementById("myTextarea").value;
+present_blades = parseMultivector(input_str);
+
+// Get the sphere parameters and draw it on return
+get_sphere(present_blades).success(function (returned_data) {
+    console.log(returned_data);
+    var centre = returned_data.centre;
+    var radius = returned_data.radius;
+    var geometry = new THREE.SphereGeometry( radius, 32, 32 );
+    var material = new THREE.MeshBasicMaterial( {color: 0xff0000, wireframe: true} );
+    var sphere = new THREE.Mesh( geometry, material );
+    sphere.position.set(centre[0],centre[1],centre[2])
+    scene.add(sphere);
+});
+
+
+// Animate the scene
+var animate = function () {
+    requestAnimationFrame( animate );
+    // required if controls.enableDamping or controls.autoRotate are set to true
+    controls.update();
+    renderer.render(scene, camera);
+};
+animate();
+
+
     </script>
-
-<textarea rows="30" cols="50" style="position: fixed; top: 0; right: 0; border: 0; resize: none;" >
-# Input your GA objects here
-# eg. 
-DrawPlane(e1 + 1.0^e2 + 2.0^e3 + 1.0^e123)
-DrawSphere()
-DrawLine()
-DrawCircle()
-DrawPoint()
-</textarea>
 
 </body>
 </html>
