@@ -14,12 +14,13 @@
 
 <body>
 
-
+<div id="scene3d"></div>
+<div>
 <textarea id="myTextarea" rows="30" cols="50" style="position: fixed; top: 0; right: 0; border: 0; resize: none;" >
 DrawSphere(-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345));
 DrawPlane((0.57735^e1234) + (0.57735^e1235) - (0.57735^e1245) + (0.57735^e1345) - (0.57735^e2345));
 </textarea>
-
+</div>
 
 
     <script src="static/three.js"></script>
@@ -183,14 +184,15 @@ var canvas_height = window.innerHeight
 var camera = new THREE.PerspectiveCamera( 75, canvas_width/canvas_height, 0.1, 1000 );
 
 // Set up orbit controls
-var controls = new THREE.OrbitControls( camera );
+container = document.getElementById( 'scene3d' );
+var controls = new THREE.OrbitControls( camera, container );
 camera.position.set( 0, 5, 5 );
 controls.update();
 
 // Create a renderer and add it to the DOM
 var renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize( canvas_width, canvas_height);
-document.body.appendChild( renderer.domElement );
+container.appendChild( renderer.domElement );
 
 // Build coordinate axes
 axes = buildAxes( 1000 );
