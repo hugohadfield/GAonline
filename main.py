@@ -39,7 +39,15 @@ def get_plane_normal(plane):
     return (plane*I5 - get_plane_origin_distance(plane)*ninf)
 
 def get_nearest_plane_point(plane):
-    return get_plane_normal(plane)*get_plane_origin_distance
+    return get_plane_normal(plane)*get_plane_origin_distance(plane)
+
+def get_circle_in_euc(circle):
+    Ic = (circle^ninf).normal()
+    GAnormal = get_plane_normal(Ic)
+    inPlaneDual = circle*Ic
+    radius = math.sqrt((inPlaneDual*inPlaneDual)[0])
+    GAcentre = down(circle*ninf*circle)
+    return [GAcentre,GAnormal,radius]
 
 def line_to_point_and_direction(line):
     L_star = line*I5
@@ -96,6 +104,24 @@ def to_line():
     print('Point: ', point)
     print('Direction: ', direction)
     return jsonify(point=point,direction=direction) 
+
+@app.route("/to_circle/",methods=['POST'])
+def to_circle():
+    print('RECIEVING CIRCLE')
+    present_blades_dict = json.loads(request.form.get('present_blades'))
+    print('Recieved blade values: ',present_blades_dict)
+    circle = dict_to_multivector(present_blades_dict)
+    print('Circle: ',circle)
+
+    GAcentre,GAnormal,radius = get_circle_in_euc(circle);
+
+    centre = as_3D_list(GAcentre)
+    normal = as_3D_list(GAnormal)
+    print('Radius: ', radius)
+    print('Centre: ', centre)
+    print('Normal: ', normal)
+    return jsonify(centre=centre,normal=normal,) 
+
 
 if __name__ == '__main__':
   app.run()
