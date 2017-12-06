@@ -11,6 +11,7 @@ ep, en, up, down, homo, E0, ninf, no = (g3c.stuff["ep"], g3c.stuff["en"],
                                         g3c.stuff["up"], g3c.stuff["down"], g3c.stuff["homo"], 
                                         g3c.stuff["E0"], g3c.stuff["einf"], -g3c.stuff["eo"])
 
+I3 = e123
 I5 = e12345
 
 
@@ -40,6 +41,16 @@ def get_plane_normal(plane):
 def get_nearest_plane_point(plane):
     return get_plane_normal(plane)*get_plane_origin_distance
 
+def line_to_point_and_direction(line):
+    L_star = line*I5
+    T = L_star|no
+    mhat = -(L_star - T*ninf)*I3
+    p = (T^mhat)*I3
+    return [p,mhat]
+
+def as_3D_list(mv_3d):
+    return  [mv_3d[1],mv_3d[2],mv_3d[3]]
+
 @app.route("/")
 def render_main():
     return render_template('main.html')
@@ -52,7 +63,7 @@ def to_sphere():
     sphere = dict_to_multivector(present_blades_dict)
     print('Sphere: ',sphere)
     GAcentre = down(get_center_from_sphere(sphere))
-    centre = [GAcentre[1],GAcentre[2],GAcentre[3]]
+    centre = as_3D_list(GAcentre)
     radius = get_radius_from_sphere(sphere)
     print('Centre: ',centre)
     print('Radius: ',radius)
@@ -66,11 +77,25 @@ def to_plane():
     plane = dict_to_multivector(present_blades_dict)
     print('Plane: ',plane)
     normalGA = get_plane_normal(plane)
-    normal = [normalGA[1],normalGA[2],normalGA[3]]
+    normal = as_3D_list(normalGA)
     distance = get_plane_origin_distance(plane)
     print('Distance: ', distance)
     print('Normal: ', normal)
     return jsonify(distance=distance,normal=normal) 
+
+@app.route("/to_line/",methods=['POST'])
+def to_line():
+    print('RECIEVING LINE')
+    present_blades_dict = json.loads(request.form.get('present_blades'))
+    print('Recieved blade values: ',present_blades_dict)
+    line = dict_to_multivector(present_blades_dict)
+    print('Line: ',line)
+    GApoint,GAdirection = line_to_point_and_direction(line)
+    point = as_3D_list(GApoint)
+    direction = as_3D_list(GAdirection)
+    print('Point: ', point)
+    print('Direction: ', direction)
+    return jsonify(point=point,direction=direction) 
 
 if __name__ == '__main__':
   app.run()

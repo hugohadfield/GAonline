@@ -15,11 +15,13 @@
 <body>
 
 <div id="scene3d"></div>
-<div>
-<textarea id="myTextarea" rows="30" cols="50" style="position: fixed; top: 0; right: 0; border: 0; resize: none;" >
+<div style="position: fixed; bottom: 0; left: 0; border: 0;">
+<textarea id="myTextarea" rows="30" cols="50" style="resize: none;" >
 DrawSphere(-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345));
 DrawPlane((0.57735^e1234) + (0.57735^e1235) - (0.57735^e1245) + (0.57735^e1345) - (0.57735^e2345));
+DrawLine(-(0.70711^e124) - (0.70711^e125) - (0.70711^e145) - (0.70711^e245));
 </textarea>
+<button onclick="ParseUserScript()">Execute script</button>
 </div>
 
 
@@ -110,7 +112,13 @@ function get_plane(present_blades){
             });
 }
 
-
+function get_line(present_blades){
+    return $.ajax({
+                url : "to_line/",
+                type : "POST",
+                data : { 'present_blades' : JSON.stringify(present_blades) } ,
+            });
+}
 
 /*
 This section creates the scene and axes
@@ -142,11 +150,17 @@ function buildAxes( length ) {
     return axes;
 }
 
+function MapToAxisSystem(vectorin){
+    return [vectorin[0],vectorin[1],vectorin[2]];
+}
+
+
+
 function DrawSphere(present_blades,scene){
     // Get the sphere parameters and draw it on return
     get_sphere(present_blades).success(function (returned_data) {
         console.log(returned_data);
-        var centre = returned_data.centre;
+        var centre = MapToAxisSystem(returned_data.centre);
         var radius = returned_data.radius;
         var geometry = new THREE.SphereGeometry( radius, 32, 32 );
         var material = new THREE.MeshBasicMaterial( {color: 0xff0000, wireframe: true} );
@@ -161,7 +175,7 @@ function DrawPlane(present_blades,scene){
     get_plane(present_blades).success(function (returned_data) {
         console.log(returned_data);
         var distance = returned_data.distance;
-        var normal = returned_data.normal;
+        var normal = MapToAxisSystem(returned_data.normal);
         var position = [normal[0]*distance,normal[1]*distance,normal[2]*distance];
         
         // Add a floor
@@ -175,18 +189,41 @@ function DrawPlane(present_blades,scene){
     });
 }
 
+
+function DrawLine(present_blades,scene){
+    // Get the sphere parameters and draw it on return
+    get_line(present_blades).success(function (returned_data) {
+        console.log(returned_data);
+        var direction = MapToAxisSystem(returned_data.direction);
+        var point = MapToAxisSystem(returned_data.point);
+        
+        var material = new THREE.LineBasicMaterial({
+            color: 0x000000
+        });
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push(
+            new THREE.Vector3( point[0]+500*direction[0], point[1]+500*direction[1], point[2]+500*direction[2] ),
+            new THREE.Vector3( point[0]-500*direction[0], point[1]-500*direction[1], point[2]-500*direction[2] )
+        );
+        var line = new THREE.Line( geometry, material );
+        scene.add( line );
+    });
+}
+
+
 // Set up the scene and window size
 var scene = new THREE.Scene();
-var canvas_width = window.innerWidth*0.75
-var canvas_height = window.innerHeight
+var canvas_width = window.innerWidth;
+var canvas_height = window.innerHeight;
 
 // Create a camera object
 var camera = new THREE.PerspectiveCamera( 75, canvas_width/canvas_height, 0.1, 1000 );
 
 // Set up orbit controls
 container = document.getElementById( 'scene3d' );
+camera.position.set( 5, 0, 5 );
+camera.up.set( 0, 0, 1 );
 var controls = new THREE.OrbitControls( camera, container );
-camera.position.set( 0, 5, 5 );
 controls.update();
 
 // Create a renderer and add it to the DOM
@@ -194,21 +231,35 @@ var renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize( canvas_width, canvas_height);
 container.appendChild( renderer.domElement );
 
-// Build coordinate axes
-axes = buildAxes( 1000 );
-scene.add(axes);
-// Add a floor
-var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
-var material = new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true, transparent: true, opacity:0.1 } );
-var floor = new THREE.Mesh( geometry, material );
-floor.material.side = THREE.DoubleSide;
-floor.rotation.x = 3.14/2.0;
-scene.add( floor );
+// Do the things
+function ParseUserScript(){
+    // Get the input string
+    var input_str = document.getElementById("myTextarea").value;
+    // Clear the scene
+    resetScene(scene);
+    // Add the new stuff
+    parseScriptToFunctions(input_str,scene);
+}
 
-// Get the input string
-var input_str = document.getElementById("myTextarea").value;
-parseScriptToFunctions(input_str,scene)
+ParseUserScript()
 
+
+function resetScene(scene){
+    // Remove everything from the scene first
+    for (let i = scene.children.length - 1; i >= 0; i--) {
+        if(scene.children[i].type === "Mesh"){
+            scene.remove(scene.children[i]);
+        }
+    }
+    // Build coordinate axes
+    axes = buildAxes( 1000 );
+    scene.add(axes);
+    // Add a floor
+    var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
+    var material = new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true, transparent: true, opacity: 0.2} );
+    var plane = new THREE.Mesh( geometry, material );
+    scene.add(plane);
+}
 
 // Animate the scene
 var animate = function () {
