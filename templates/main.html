@@ -207,7 +207,7 @@ function DrawLine(present_blades,scene){
         var direction = MapToAxisSystem(returned_data.direction);
         var point = MapToAxisSystem(returned_data.point);
         
-        var material = new THREE.MeshBasicMaterial({
+        var material = new THREE.LineBasicMaterial({
             color: 0x000000
         });
         var geometry = new THREE.Geometry();
@@ -280,15 +280,9 @@ ParseUserScript()
 function resetScene(scene){
     // Remove everything from the scene first
     for (let i = scene.children.length - 1; i >= 0; i--) {
-        if(scene.children[i].type === "Mesh"){ //only removing mesh. Remove everything?
-            scene.remove(scene.children[i]);
-        }
+        scene.remove(scene.children[i]);
     }
     // Build coordinate axes
-
-    //Don't think this is necessary every time. I am worried you are add them on top of each other. 
-    //In particular  if dashed lines are used as they seem to not be remobed by the for loop above. 
-    //Would remove this, and rather have a specific function that is called the first time, or remove eveyrthing
     axes = buildAxes( 1000 ); 
     scene.add(axes);
 
