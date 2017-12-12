@@ -1,2 +1,3 @@
 Flask==0.12.1
 clifford==0.81
+git+git@github.com:hugohadfield/clifford_tools.git
