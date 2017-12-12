@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, json, request, render_template
 import clifford as cf
 from clifford import g3c
+from clifford_tools.common.g3c import *
 import numpy as np
 import math
 
@@ -15,46 +16,8 @@ I3 = e123
 I5 = e12345
 
 
-
 app = Flask(__name__)
 
-def dict_to_multivector(dict_in):
-    constructed_values = np.zeros(32)
-    for k in list(dict_in.keys()):
-        constructed_values[int(k)] = dict_in[k]
-    return cf.MultiVector(layout,constructed_values)
-
-def get_center_from_sphere(sphere):
-    center = sphere*ninf*sphere
-    return center
-
-def get_radius_from_sphere(sphere):
-    dual_sphere = sphere*I5
-    return math.sqrt( abs(dual_sphere*dual_sphere) )
-
-def get_plane_origin_distance(plane):
-    return float(((plane*I5)|no)[0])
-
-def get_plane_normal(plane):
-    return (plane*I5 - get_plane_origin_distance(plane)*ninf)
-
-def get_nearest_plane_point(plane):
-    return get_plane_normal(plane)*get_plane_origin_distance(plane)
-
-def get_circle_in_euc(circle):
-    Ic = (circle^ninf).normal()
-    GAnormal = get_plane_normal(Ic)
-    inPlaneDual = circle*Ic
-    radius = math.sqrt((inPlaneDual*inPlaneDual)[0])
-    GAcentre = down(circle*ninf*circle)
-    return [GAcentre,GAnormal,radius]
-
-def line_to_point_and_direction(line):
-    L_star = line*I5
-    T = L_star|no
-    mhat = -(L_star - T*ninf)*I3
-    p = (T^mhat)*I3
-    return [p,mhat]
 
 def as_3D_list(mv_3d):
     return  [mv_3d[1],mv_3d[2],mv_3d[3]]
