@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, json, request, render_template
 import clifford as cf
 from clifford import g3c
-from clifford_tools.common.g3c.core import *
+from clifford_tools.common.g3c import *
 import numpy as np
 import math
 
