@@ -17,10 +17,10 @@
 <div id="scene3d"></div>
 <div style="position: fixed; bottom: 0; left: 0; border: 0;">
 <textarea id="myTextarea" rows="30" cols="50" style="resize: none;" >
-DrawSphere(-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345));
-DrawPlane((0.57735^e1234) + (0.57735^e1235) - (0.57735^e1245) + (0.57735^e1345) - (0.57735^e2345));
-DrawLine(-(0.70711^e124) - (0.70711^e125) - (0.70711^e145) - (0.70711^e245));
-DrawCircle(-(0.07071^e124) + (0.07071^e125) - (0.07071^e134) + (0.07071^e135) + (0.70711^e145) + (0.07071^e234) - (0.07071^e235) - (0.70711^e245));
+DrawSphere(-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345),rgb(255,0,0));
+DrawPlane((0.57735^e1234) + (0.57735^e1235) - (0.57735^e1245) + (0.57735^e1345) - (0.57735^e2345),rgb(255,255,0));
+DrawLine(-(0.70711^e124) - (0.70711^e125) - (0.70711^e145) - (0.70711^e245),rgb(255,0,255));
+DrawCircle(-(0.07071^e124) + (0.07071^e125) - (0.07071^e134) + (0.07071^e135) + (0.70711^e145) + (0.07071^e234) - (0.07071^e235) - (0.70711^e245),rgb(0,0,255));
 </textarea>
 <button onclick="ParseUserScript()">Execute script</button>
 <button onclick="CenterViewBtn()">Center view</button>
@@ -78,24 +78,35 @@ function parseMultivector(str){
     return present_blades
 }
 
-function callFunction(funcName,mvArg,scene){
-    present_blades = parseMultivector(mvArg);
-    window[funcName](present_blades,scene);
+function callFunction(funcName,mvString,colorString,scene){
+    var present_blades = parseMultivector(mvString);
+    window[funcName](present_blades,colorString,scene);
 }
 
-
 // Regex tha extracts the functions with their arguments
-var functionRegex = /\w+\(.+\)/g;
+var functionRegex = /\w+\(.+\);/g;
 
 function parseScriptToFunctions(str,scene){
     var myStringArray = str.match(functionRegex);
     for (var i = 0; i < myStringArray.length; i++) {
         var thisFunctionString = myStringArray[i];
+        // Get the function name
         var funcName = thisFunctionString.split(/\(/,1)[0];
         console.log(funcName);
-        var mvArg = thisFunctionString.slice(funcName.length+1,-1);
+
+        // Get the arguments to the function as a string
+        var mvArg = thisFunctionString.slice(funcName.length+1,-2);
         console.log(mvArg);
-        callFunction(funcName,mvArg,scene);
+
+        // Split the argument string on the first comma which comes immediately after the multivector
+        var mvString = mvArg.split(/,/,1)[0];
+        console.log(mvString);
+
+        var colorString = mvArg.slice(mvString.length+1);
+        console.log(colorString);
+
+        // Call the function with the relevant arguments
+        callFunction(funcName,mvString,colorString,scene);
     }
 }
 
@@ -167,21 +178,21 @@ function MapToAxisSystem(vectorin){
 
 
 
-function DrawSphere(present_blades,scene){
+function DrawSphere(present_blades,draw_color,scene){
     // Get the sphere parameters and draw it on return
     get_sphere(present_blades).success(function (returned_data) {
         console.log(returned_data);
         var centre = MapToAxisSystem(returned_data.centre);
         var radius = returned_data.radius;
         var geometry = new THREE.SphereGeometry( radius, 32, 32 );
-        var material = new THREE.MeshBasicMaterial( {color: 0xff0000, wireframe: true} );
+        var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: true} );
         var sphere = new THREE.Mesh( geometry, material );
         sphere.position.set(centre[0],centre[1],centre[2])
         scene.add(sphere);
     });
 }
 
-function DrawPlane(present_blades,scene){
+function DrawPlane(present_blades,draw_color,scene){
     // Get the sphere parameters and draw it on return
     get_plane(present_blades).success(function (returned_data) {
         console.log(returned_data);
@@ -191,7 +202,7 @@ function DrawPlane(present_blades,scene){
         
         // Add a floor
         var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
-        var material = new THREE.MeshBasicMaterial( { color: 0xff0000, wireframe: true} );
+        var material = new THREE.MeshBasicMaterial( { color: draw_color, wireframe: true} );
         var plane = new THREE.Mesh( geometry, material );
         plane.material.side = THREE.DoubleSide;
         plane.lookAt(normal[0],normal[1],normal[2]);
@@ -201,14 +212,14 @@ function DrawPlane(present_blades,scene){
 }
 
 
-function DrawLine(present_blades,scene){
+function DrawLine(present_blades,draw_color,scene){
     get_line(present_blades).success(function (returned_data) {
         console.log(returned_data);
         var direction = MapToAxisSystem(returned_data.direction);
         var point = MapToAxisSystem(returned_data.point);
         
         var material = new THREE.LineBasicMaterial({
-            color: 0x000000
+            color: draw_color
         });
         var geometry = new THREE.Geometry();
         geometry.vertices.push(
@@ -220,7 +231,7 @@ function DrawLine(present_blades,scene){
     });
 }
 
-function DrawCircle(present_blades,scene){
+function DrawCircle(present_blades,draw_color,scene){
     get_circle(present_blades).success(function (returned_data) {
         console.log(returned_data);
         var radius = returned_data.radius;
@@ -228,7 +239,7 @@ function DrawCircle(present_blades,scene){
         var normal = MapToAxisSystem(returned_data.normal);
             
         var geometry = new THREE.TorusGeometry( radius, 0.05, 16,32 );
-        var material = new THREE.MeshBasicMaterial( { color: 0xffff00 } );
+        var material = new THREE.MeshBasicMaterial( { color: draw_color } );
         var torus = new THREE.Mesh( geometry, material );
         torus.lookAt(normal[0],normal[1],normal[2]);
         torus.position.set(centre[0],centre[1],centre[2]);
