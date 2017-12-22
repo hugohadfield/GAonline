@@ -120,7 +120,7 @@ def to_circle():
     print('Radius: ', radius)
     print('Centre: ', centre)
     print('Normal: ', normal)
-    return jsonify(centre=centre,normal=normal,) 
+    return jsonify(centre=centre,normal=normal,radius=radius) 
 
 
 if __name__ == '__main__':
