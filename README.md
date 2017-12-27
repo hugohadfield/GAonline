@@ -6,7 +6,8 @@ http://gaonline.azurewebsites.net/
 
 The project is intentionally fairly barebones, although help on improving the interface would be very appreciated.
 
-# The flask server can be started by running
+# Running the server
+The flask server can be started by running:
 python main.py
 
 # NB.
