@@ -18,6 +18,7 @@
 <div style="position: fixed; bottom: 0; left: 0; border: 0;">
     <textarea id="scriptTextArea" rows="30" cols="50" style="resize: none;" ></textarea>
     <div>
+        Draw axes and floor: <input type="checkbox" id="axesCheck" checked="checked">
         <div>
             <button onclick="ParseUserScript()">Execute script</button>
             <button onclick="CenterViewBtn()">Center view</button>
@@ -30,10 +31,10 @@
 </div>
 
 
-    <script src="static/three.js"></script>
-    <script src="static/OrbitControls.js"></script>
+<script src="static/three.js"></script>
+<script src="static/OrbitControls.js"></script>
 
-    <script>
+<script>
 
 var defaultScript = `DrawSphere(-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345),rgb(255,0,0));
 DrawPlane((0.57735^e1234) + (0.57735^e1235) - (0.57735^e1245) + (0.57735^e1345) - (0.57735^e2345),rgb(255,255,0));
@@ -301,7 +302,8 @@ function ParseUserScript(){
     // Get the input string
     var input_str = document.getElementById("scriptTextArea").value;
     // Clear the scene
-    resetScene(scene);
+    var draw_axes = document.getElementById("axesCheck").checked;
+    resetScene(scene,draw_axes);
     // Add the new stuff
     parseScriptToFunctions(input_str,scene);
 }
@@ -309,20 +311,22 @@ function ParseUserScript(){
 ParseUserScript()
 
 
-function resetScene(scene){
+function resetScene(scene, floor_and_axes_bool){
     // Remove everything from the scene first
     for (let i = scene.children.length - 1; i >= 0; i--) {
         scene.remove(scene.children[i]);
     }
-    // Build coordinate axes
-    axes = buildAxes( 1000 ); 
-    scene.add(axes);
+    if (floor_and_axes_bool){
+        // Build coordinate axes
+        axes = buildAxes( 1000 ); 
+        scene.add(axes);
 
-    // Add a floor
-    var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
-    var material = new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true, transparent: true, opacity: 0.2} );
-    var plane = new THREE.Mesh( geometry, material );
-    scene.add(plane);
+        // Add a floor
+        var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
+        var material = new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true, transparent: true, opacity: 0.2} );
+        var plane = new THREE.Mesh( geometry, material );
+        scene.add(plane);
+    }
 }
 
 // Animate the scene
