@@ -75,7 +75,7 @@ def to_sphere():
     radius = get_radius_from_sphere(sphere)
     print('Centre: ',centre)
     print('Radius: ',radius)
-    return jsonify(centre=centre,radius=radius) 
+    return jsonify(centre=centre,radius=radius)
 
 @app.route("/to_plane/",methods=['POST'])
 def to_plane():
