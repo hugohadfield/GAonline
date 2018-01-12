@@ -45,6 +45,8 @@ def get_circle_in_euc(circle):
     Ic = (circle^ninf).normal()
     GAnormal = get_plane_normal(Ic)
     inPlaneDual = circle*Ic
+    mag = float((inPlaneDual|ninf)[0])
+    inPlaneDual = -inPlaneDual/mag
     radius = math.sqrt((inPlaneDual*inPlaneDual)[0])
     GAcentre = down(circle*ninf*circle)
     return [GAcentre,GAnormal,radius]
