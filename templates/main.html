@@ -66,7 +66,7 @@ var blades = {"e1":1,"e2":2,"e3":3,"e4":4,"e5":5,
 "e1234":26,"e1235":27,"e1245":28,"e1345":29,"e2345":30,"e12345":31};
 
 // Regex that extract the blades from the input string
-var bladeRegex = /((^|\s)-?\s?\d+(\.\d+)?)\s|(-\s?\d+(\.\d+)?\^e\d+(\s|$))|((^|\+)\s?\d+(\.\d+)?\^e\d+(\s|$))/g;
+var bladeRegex = /((^|\s)-?\s?\d+(\.\d+)?)\s|(-\s?(\d+((e(\+|-))|\.)?(\d+)?)\^e\d+(\s|$))|((^|\+)\s?(\d+((e(\+|-))|\.)?(\d+)?)\^e\d+(\s|$))/g;
 
 function parseMultivector(str){
 
