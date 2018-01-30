@@ -281,16 +281,28 @@ var camera = new THREE.PerspectiveCamera( 75, canvas_width/canvas_height, 0.1, 1
 // Set up orbit controls
 container = document.getElementById( 'scene3d' );
 
-
-function CenterViewBtn(){
+function ResetCamera(){
     camera.position.set( 5, 0, 5 );
     camera.up.set( 0, 0, 1 );
+}
+
+function ResetControls(){
+    controls.target = new THREE.Vector3();
+}
+
+
+ResetCamera();
+
+var controls = new THREE.OrbitControls( camera, container );
+controls.update();
+
+function CenterViewBtn(){
+    ResetCamera();
+    ResetControls();
 };
 
 CenterViewBtn();
 
-var controls = new THREE.OrbitControls( camera, container );
-controls.update();
 
 // Create a renderer and add it to the DOM
 var renderer = new THREE.WebGLRenderer({ alpha: true });
