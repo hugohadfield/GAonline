@@ -13,7 +13,7 @@
 
 
 <body>
-
+<div sytle="position: fixed; top: 8px; left: 16px;" id="frameCounterText">0</div>
 <div id="scene3d"></div>
 <div style="position: fixed; bottom: 0; left: 0; border: 0;">
     <textarea id="scriptTextArea" rows="30" cols="50" style="resize: none;" ></textarea>
@@ -21,6 +21,7 @@
         Draw axes and floor: <input type="checkbox" id="axesCheck" checked="checked">
         <div>
             <button onclick="ParseUserScript()">Execute script</button>
+            <button onclick="AnimateUserScript(100.0,0,true)">Animate script</button>
             <button onclick="CenterViewBtn()">Center view</button>
         </div>
         <div>
@@ -39,7 +40,8 @@
 var defaultScript = `DrawSphere(-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345),rgb(255,0,0));
 DrawPlane((0.57735^e1234) + (0.57735^e1235) - (0.57735^e1245) + (0.57735^e1345) - (0.57735^e2345),rgb(255,255,0));
 DrawLine(-(0.70711^e124) - (0.70711^e125) - (0.70711^e145) - (0.70711^e245),rgb(255,0,255));
-DrawCircle(-(0.07071^e124) + (0.07071^e125) - (0.07071^e134) + (0.07071^e135) + (0.70711^e145) + (0.07071^e234) - (0.07071^e235) - (0.70711^e245),rgb(0,0,255));`;
+DrawCircle(-(0.07071^e124) + (0.07071^e125) - (0.07071^e134) + (0.07071^e135) + (0.70711^e145) + (0.07071^e234) - (0.07071^e235) - (0.70711^e245),rgb(0,0,255));
+DrawEucPoint(0.5^e1 + 0.5^e2 - 0.5^e3,rgb(255,0,0));`;
 document.getElementById("scriptTextArea").value = defaultScript;
 
 function loadFileAsText()
@@ -199,6 +201,15 @@ function MapToAxisSystem(vectorin){
 }
 
 
+function DrawEucPoint(present_blades,draw_color,scene){
+    var radius = 0.05;
+    var geometry = new THREE.SphereGeometry( radius, 32, 32 );
+    var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
+    var sphere = new THREE.Mesh( geometry, material );
+    sphere.position.set(present_blades[1],present_blades[2],present_blades[3])
+    scene.add(sphere);
+}
+
 
 function DrawSphere(present_blades,draw_color,scene){
     // Get the sphere parameters and draw it on return
@@ -308,6 +319,34 @@ CenterViewBtn();
 var renderer = new THREE.WebGLRenderer({ alpha: true });
 renderer.setSize( canvas_width, canvas_height);
 container.appendChild( renderer.domElement );
+
+var scriptLines = "";
+var ANIMATION_RUNNING = false;
+function AnimateUserScript(frameRate, frameCounter, init){
+    if (ANIMATION_RUNNING == true) {
+        if (init == true){
+            return 1
+        }
+    }
+    console.log(frameCounter);
+    if (frameCounter == 0){
+        scriptLines = document.getElementById("scriptTextArea").value.split('\n');
+        ANIMATION_RUNNING = true;
+    }
+    if (frameCounter < scriptLines.length){
+        var input_str = scriptLines[frameCounter]
+        // Clear the scene
+        var draw_axes = document.getElementById("axesCheck").checked;
+        resetScene(scene,draw_axes);
+        // Add the new stuff
+        parseScriptToFunctions(input_str,scene);
+        window.setTimeout(function() {AnimateUserScript(frameRate, frameCounter+1, false)}, 1000.0/(frameRate))
+    }
+    else{
+        ANIMATION_RUNNING = false;
+    }
+}
+
 
 // Do the things
 function ParseUserScript(){
