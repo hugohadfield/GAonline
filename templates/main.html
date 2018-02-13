@@ -13,6 +13,7 @@
 
 
 <body>
+<input type="button" value="Refresh Page" onClick="window.location.reload()">
 <div sytle="position: fixed; top: 8px; left: 16px;" id="frameCounterText">0</div>
 <div id="scene3d"></div>
 <div style="position: fixed; bottom: 0; left: 0; border: 0;">
@@ -107,7 +108,7 @@ function callFunction(funcName,mvString,colorString,scene){
     window[funcName](present_blades,colorString,scene);
 }
 
-// Regex tha extracts the functions with their arguments
+// Regex that extracts the functions with their arguments
 var functionRegex = /\w+\(.+\);/g;
 
 function parseScriptToFunctions(str,scene){
@@ -334,7 +335,7 @@ function AnimateUserScript(frameRate, frameCounter, init){
         ANIMATION_RUNNING = true;
     }
     if (frameCounter < scriptLines.length){
-        var input_str = scriptLines[frameCounter]
+        var input_str = scriptLines[frameCounter].replace(/#/g, "\n")
         // Clear the scene
         var draw_axes = document.getElementById("axesCheck").checked;
         resetScene(scene,draw_axes);
@@ -359,8 +360,14 @@ function ParseUserScript(){
     parseScriptToFunctions(input_str,scene);
 }
 
-ParseUserScript()
+ParseUserScript();
 
+
+// Add a floor
+var ground_geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
+var ground_material = new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true, transparent: true, opacity: 0.2} );
+var ground_plane = new THREE.Mesh( ground_geometry, ground_material );
+var global_axes = buildAxes( 1000 ); 
 
 function resetScene(scene, floor_and_axes_bool){
     // Remove everything from the scene first
@@ -369,14 +376,8 @@ function resetScene(scene, floor_and_axes_bool){
     }
     if (floor_and_axes_bool){
         // Build coordinate axes
-        axes = buildAxes( 1000 ); 
-        scene.add(axes);
-
-        // Add a floor
-        var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
-        var material = new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true, transparent: true, opacity: 0.2} );
-        var plane = new THREE.Mesh( geometry, material );
-        scene.add(plane);
+        scene.add(global_axes);
+        scene.add(ground_plane);
     }
 }
 
