@@ -48,7 +48,8 @@ def get_circle_in_euc(circle):
     mag = float((inPlaneDual|ninf)[0])
     inPlaneDual = -inPlaneDual/mag
     radius = math.sqrt((inPlaneDual*inPlaneDual)[0])
-    GAcentre = down(circle*ninf*circle)
+    #GAcentre = down(circle*ninf*circle)
+    GAcentre = down(inPlaneDual*(1+0.5*inPlaneDual*einf))
     return [GAcentre,GAnormal,radius]
 
 def line_to_point_and_direction(line):
