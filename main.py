@@ -18,6 +18,14 @@ I5 = e12345
 
 app = Flask(__name__)
 
+
+def normalise_n_minus_1(mv):
+    scale = (mv|ninf)[0]
+    if scale != 0.0:
+        return -mv/scale
+    else:
+        raise ZeroDivisionError('Multivector has 0 ninf component')
+
 def dict_to_multivector(dict_in):
     constructed_values = np.zeros(32)
     for k in list(dict_in.keys()):
@@ -30,6 +38,7 @@ def get_center_from_sphere(sphere):
 
 def get_radius_from_sphere(sphere):
     dual_sphere = sphere*I5
+    dual_sphere = dual_sphere/(-dual_sphere|ninf)
     return math.sqrt( abs(dual_sphere*dual_sphere) )
 
 def get_plane_origin_distance(plane):
@@ -49,8 +58,17 @@ def get_circle_in_euc(circle):
     inPlaneDual = -inPlaneDual/mag
     radius = math.sqrt((inPlaneDual*inPlaneDual)[0])
     #GAcentre = down(circle*ninf*circle)
-    GAcentre = down((inPlaneDual*(1+0.5*inPlaneDual*ninf))(1))
+    GAcentre = down(inPlaneDual*(1+0.5*inPlaneDual*ninf))
     return [GAcentre,GAnormal,radius]
+
+def point_pair_to_end_points(T):
+    beta = math.sqrt((T*T)[0])
+    F = T/beta
+    P = 0.5*(1+F)
+    P_twiddle = 0.5*(1-F)
+    A = normalise_n_minus_1(-P_twiddle*(T|ninf))
+    B = normalise_n_minus_1(P*(T|ninf))
+    return A,B
 
 def line_to_point_and_direction(line):
     L_star = line*I5
@@ -65,6 +83,20 @@ def as_3D_list(mv_3d):
 @app.route("/")
 def render_main():
     return render_template('main.html')
+
+@app.route("/to_point_pair/",methods=['POST'])
+def to_point_pair():
+    print('RECIEVING POINT PAIR')
+    present_blades_dict = json.loads(request.form.get('present_blades'))
+    print('Recieved blade values: ',present_blades_dict)
+    point_pair = dict_to_multivector(present_blades_dict)
+    print('Point pair: ',point_pair)
+    A,B = point_pair_to_end_points(point_pair)
+    a = as_3D_list(down(A))
+    b = as_3D_list(down(B))
+    print('a: ',a)
+    print('b: ',b)
+    return jsonify(a=a,b=b)
 
 @app.route("/to_sphere/",methods=['POST'])
 def to_sphere():

@@ -42,6 +42,7 @@ var defaultScript = `DrawSphere(-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^
 DrawPlane((0.57735^e1234) + (0.57735^e1235) - (0.57735^e1245) + (0.57735^e1345) - (0.57735^e2345),rgb(255,255,0));
 DrawLine(-(0.70711^e124) - (0.70711^e125) - (0.70711^e145) - (0.70711^e245),rgb(255,0,255));
 DrawCircle(-(0.07071^e124) + (0.07071^e125) - (0.07071^e134) + (0.07071^e135) + (0.70711^e145) + (0.07071^e234) - (0.07071^e235) - (0.70711^e245),rgb(0,0,255));
+DrawPointPair((12.0^e12) - (16.0^e23) + (56.0^e24) + (60.0^e25),rgb(255,0,255));
 DrawEucPoint(0.5^e1 + 0.5^e2 - 0.5^e3,rgb(255,0,0));`;
 document.getElementById("scriptTextArea").value = defaultScript;
 
@@ -135,6 +136,14 @@ function parseScriptToFunctions(str,scene){
     }
 }
 
+function get_point_pair(present_blades){
+    return $.ajax({
+                url : "to_point_pair/",
+                type : "POST",
+                data : { 'present_blades' : JSON.stringify(present_blades) } ,
+            });
+}
+
 function get_sphere(present_blades){
     return $.ajax({
                 url : "to_sphere/",
@@ -199,6 +208,53 @@ function buildAxes( length ) {
 
 function MapToAxisSystem(vectorin){
     return [vectorin[0],vectorin[1],vectorin[2]];
+}
+
+
+function DrawPointPair(present_blades,draw_color,scene){
+    get_point_pair(present_blades).success(function (returned_data) {
+        console.log(returned_data);
+        var a = returned_data.a;
+        var b = returned_data.b;
+        
+        var radius = 0.05;
+        var geometry = new THREE.SphereGeometry( radius, 32, 32 );
+        var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
+        var sphere_a = new THREE.Mesh( geometry, material );
+        sphere_a.position.set(a[0],a[1],a[2])
+        scene.add(sphere_a);
+
+        var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
+        var sphere_b = new THREE.Mesh( geometry, material );
+        sphere_b.position.set(b[0],b[1],b[2])
+        scene.add(sphere_b);
+
+        var material = new THREE.LineBasicMaterial({
+            color: draw_color
+        });
+
+        var a_pos = new THREE.Vector3( a[0],a[1],a[2] )
+        var b_pos = new THREE.Vector3( b[0],b[1],b[2] )
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push(
+            a_pos,
+            b_pos
+        );
+        var line = new THREE.Line( geometry, material );
+        scene.add( line );
+
+        var geometry = new THREE.ConeGeometry( 2*radius, radius*4, 6 );
+        var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
+        var cone = new THREE.Mesh( geometry, material );
+        var c_pos = a_pos.clone();
+        c_pos.add( b_pos ).multiplyScalar(0.5);
+
+        var axis = new THREE.Vector3(0, 1, 0);
+        cone.quaternion.setFromUnitVectors(axis, b_pos.clone().sub(a_pos).normalize());
+        cone.position.set( c_pos.x, c_pos.y, c_pos.z );
+        scene.add( cone );
+
+    });
 }
 
 
@@ -360,14 +416,14 @@ function ParseUserScript(){
     parseScriptToFunctions(input_str,scene);
 }
 
-ParseUserScript();
-
-
 // Add a floor
 var ground_geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
 var ground_material = new THREE.MeshBasicMaterial( { color: 0x0000ff, wireframe: true, transparent: true, opacity: 0.2} );
 var ground_plane = new THREE.Mesh( ground_geometry, ground_material );
 var global_axes = buildAxes( 1000 ); 
+
+ParseUserScript();
+
 
 function resetScene(scene, floor_and_axes_bool){
     // Remove everything from the scene first
