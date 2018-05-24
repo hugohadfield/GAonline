@@ -62,7 +62,7 @@ def get_circle_in_euc(circle):
     return [GAcentre,GAnormal,radius]
 
 def point_pair_to_end_points(T):
-    beta = math.sqrt((T*T)[0])
+    beta = math.sqrt(abs((T*T)[0]))
     F = T/beta
     P = 0.5*(1+F)
     P_twiddle = 0.5*(1-F)
