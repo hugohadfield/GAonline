@@ -263,7 +263,16 @@ function DrawEucPoint(present_blades,draw_color,scene){
     var geometry = new THREE.SphereGeometry( radius, 32, 32 );
     var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
     var sphere = new THREE.Mesh( geometry, material );
-    sphere.position.set(present_blades[1],present_blades[2],present_blades[3])
+
+    var a = present_blades[1]
+    var b = present_blades[2]
+    var c = present_blades[3]
+
+    if (typeof(a) === "undefined") {a = 0.0;};
+    if (typeof(b) === "undefined") {b = 0.0;};
+    if (typeof(c) === "undefined") {c = 0.0;};
+
+    sphere.position.set(a,b,c)
     scene.add(sphere);
 }
 
