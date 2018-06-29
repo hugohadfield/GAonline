@@ -9,11 +9,48 @@
     <style>
             body { margin: 500; margin-right: 100; overflow: hidden}
             canvas { width: 100%; height: 100%; overflow: hidden}
+            #overlay {
+                background: rgba(0, 0, 0, .4);
+                bottom: 0;
+                left: 0;
+                position: absolute;
+                right: 0;
+                top: 0;
+                z-index: 10;
+            }
+
+            #home_text {
+                background: white;
+                margin: 20px auto 0;
+                width: 70%;
+            }
     </style>
 </head>
 
 
 <body>
+    <div id="overlay">
+        <div id="home_text">
+        <h1>GAonline</h1>
+        <p>A flask, clifford and threejs/javascript visualiser for (4,1) Conformal Geometric Algebra (CGA).</p>
+
+        <h1>Use it now</h1>
+        <p>An Azure deployment of this project can be found here: http://gaonline.azurewebsites.net/</p>
+
+        <p>The project is intentionally fairly barebones, although help on improving the interface would be very appreciated! The key goal of this project is to</p>
+
+        <h1>Setting up and running the server</h1>
+        <p>First clone this repository and ensure you have the required packages on your machine Flask>=0.12.1 clifford>=0.81</p>
+
+        <p>The flask server can be started by running: </p>
+        <p>python main.py</p>
+
+        <p>It works very well when run locally, I find an especially useful combination is to use embedded chrome with a flask server as shown here: https://github.com/cztomczak/cefpython </p>
+
+        <h1>A note on performance:</h1>
+        <p>This is a very 'lazy' implementation in that it falls back on server side clifford to do all the heavy lifting, this would not be a good way of doing things for a real production site as it will be bandwidth and sever side heavy. </p>
+        </div>
+    </div>
 <input type="button" value="Refresh Page" onClick="window.location.reload()">
 <div sytle="position: fixed; top: 8px; left: 16px;" id="frameCounterText">0</div>
 <div id="scene3d"></div>
@@ -38,6 +75,16 @@
 <script src="static/OrbitControls.js"></script>
 
 <script>
+
+$(document).ready(function() {
+    var overlay = $('#overlay');
+    overlay.on('click', function (e) {
+        overlay
+            .hide()
+            .off();
+    });
+});
+
 
 var defaultScript = `DrawSphere(-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345),rgb(255,0,0));
 DrawPlane((0.57735^e1234) + (0.57735^e1235) - (0.57735^e1245) + (0.57735^e1345) - (0.57735^e2345),rgb(255,255,0));
