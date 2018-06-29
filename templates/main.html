@@ -3,8 +3,10 @@
 
  <head>
     <meta charset=utf-8>
-    <title>GA online</title>
+    <title>GAOnline - A flask, clifford and threejs/javascript visualiser for (4,1) Conformal Geometric Algebra (CGA)</title>
     <meta name="google-site-verification" content="WXW9vG1sMxNwXMh_XKQ_8g98pQGMvxTY0yPIqxRlKgs" />
+    <meta name="description" content="The key goal of this project is to be able to visualise conformal objects. With this visualiser there is minimal installation (none if you use a web deployed version!).">
+    <meta name="keywords" content="Conformal Geometric Algebra, Geometric Algebra, conformal, geometry, visualiser, flask, javascript, python, clifford, Clifford Algebra">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <style>
             body { margin: 500; margin-right: 100; overflow: hidden}
@@ -34,10 +36,12 @@
         <h1>GAonline</h1>
         <p>A flask, clifford and threejs/javascript visualiser for (4,1) Conformal Geometric Algebra (CGA).</p>
 
-        <h1>Use it now</h1>
-        <p>An Azure deployment of this project can be found here: http://gaonline.azurewebsites.net/</p>
+        <p>Created by <a href="https://github.com/hugohadfield">Hugo Hadfield</a></p>
 
-        <p>The project is intentionally fairly barebones, although help on improving the interface would be very appreciated! The key goal of this project is to</p>
+        <h1>Use it now</h1>
+        <p>An Azure deployment of this project can be found here: <a href="http://gaonline.azurewebsites.net/">http://gaonline.azurewebsites.net/</a> </p>
+
+        <p>The project is intentionally fairly barebones, although help on improving the interface would be very appreciated! The key goal of this project is to be able to visualise conformal objects that are very hard to think about otherwise. With this visualiser there is minimal installation (none if you use a web deployed version!) and the code is incredibly simple.</p>
 
         <h1>Setting up and running the server</h1>
         <p>First clone this repository and ensure you have the required packages on your machine Flask>=0.12.1 clifford>=0.81</p>
@@ -45,7 +49,7 @@
         <p>The flask server can be started by running: </p>
         <p>python main.py</p>
 
-        <p>It works very well when run locally, I find an especially useful combination is to use embedded chrome with a flask server as shown here: https://github.com/cztomczak/cefpython </p>
+        <p>It works very well when run locally, I find an especially useful combination is to use embedded chrome with a flask server as shown here: <a href="https://github.com/hugohadfield/cefFlask">https://github.com/hugohadfield/cefFlask</a> </p>
 
         <h1>A note on performance:</h1>
         <p>This is a very 'lazy' implementation in that it falls back on server side clifford to do all the heavy lifting, this would not be a good way of doing things for a real production site as it will be bandwidth and sever side heavy. </p>
