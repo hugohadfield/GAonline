@@ -1,2 +1,2 @@
 Flask>=0.12.1
-clifford>=0.82
+clifford==0.81
