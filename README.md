@@ -7,6 +7,10 @@ Created by [Hugo Hadfield](https://github.com/hugohadfield)
 An Azure deployment of this project can be found here:
 http://gaonline.azurewebsites.net/
 
+A tutorial coving basic usage can be found here:
+https://hugohadfield.github.io/GAonline/index.html
+
+
 The project is intentionally fairly barebones, although help on improving the interface would be very appreciated! 
 
 The key goal of this project is to be able to visualise conformal objects that are very hard to think about otherwise. With this visualiser there is minimal installation (none if you use a web deployed version!) and the code is incredibly simple.
