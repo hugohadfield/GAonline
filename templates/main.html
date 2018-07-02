@@ -21,7 +21,7 @@
                 z-index: 10;
             }
 
-            #home_text {
+            #overlay_text {
                 background: white;
                 margin: 20px auto 0;
                 height: 100%;
@@ -33,7 +33,10 @@
 
 <body>
     <div id="overlay">
-        <div id="home_text">
+        <div id="overlay_text">
+
+        <input type="button" value="Hide Help" onClick="hide_overlay()">
+
         <h1>GAonline</h1>
         <p>A flask, clifford and threejs/javascript visualiser for (4,1) Conformal Geometric Algebra (CGA).</p>
 
@@ -45,9 +48,10 @@
 
 
         <p>The project is intentionally fairly barebones, although help on improving the interface would be very appreciated! The key goal of this project is to be able to visualise conformal objects that are very hard to think about otherwise. With this visualiser there is minimal installation (none if you use a web deployed version!) and the code is incredibly simple.</p>
-
+        <br>
+        <br>
         <h1>Setting up and running the server locally</h1>
-        <h2>Only for advance usage</h2>
+        <h2>Only for advance users</h2>
         <p>First clone this repository and ensure you have the required packages on your machine Flask>=0.12.1 clifford>=0.81</p>
 
         <p>The flask server can be started by running: </p>
@@ -60,6 +64,7 @@
         </div>
     </div>
 <input type="button" value="Refresh Page" onClick="window.location.reload()">
+<input type="button" value="Help" onClick="show_overlay()">
 <div sytle="position: fixed; top: 8px; left: 16px;" id="frameCounterText">0</div>
 <div id="scene3d"></div>
 <div style="position: fixed; bottom: 0; left: 0; border: 0;">
@@ -84,14 +89,27 @@
 
 
 <script>
-$(document).ready(function() {
+// $(document).ready(function() {
+//     var overlay = $('#overlay');
+//     overlay.on('click', function (e) {
+//         overlay
+//             .hide()
+//             .off();
+//     });
+// });
+
+function show_overlay(){
     var overlay = $('#overlay');
-    overlay.on('click', function (e) {
-        overlay
-            .hide()
-            .off();
-    });
-});
+    overlay.show().on();
+}
+
+
+function hide_overlay(){
+    var overlay = $('#overlay');
+    overlay.hide().off();
+}
+
+
 
 var defaultScript = `DrawSphere(-(3.0^e1234) - (2.0^e1235) + (2.0^e1245) - (1.0^e1345) + (1.0^e2345),rgb(255,0,0));
 DrawPlane((0.57735^e1234) + (0.57735^e1235) - (0.57735^e1245) + (0.57735^e1345) - (0.57735^e2345),rgb(255,255,0));
