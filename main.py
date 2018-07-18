@@ -55,7 +55,7 @@ def render_cluster_circles():
     return render_template('cluster_circles.html', show_help=False)
 
 
-@app.route("/to_point_pair/",methods=['POST'])
+@app.route("/to_point_pair/", methods=['POST'])
 def to_point_pair():
     print('RECIEVING POINT PAIR')
     present_blades_dict = json.loads(request.form.get('present_blades'))
