@@ -28,7 +28,7 @@ DrawLine(-(0.70711^e124) - (0.70711^e125) - (0.70711^e145) - (0.70711^e245),rgb(
 DrawCircle(-(0.07071^e124) + (0.07071^e125) - (0.07071^e134) + (0.07071^e135) + (0.70711^e145) + (0.07071^e234) - (0.07071^e235) - (0.70711^e245),rgb(0,0,255));
 DrawPointPair((12.0^e12) - (16.0^e23) + (56.0^e24) + (60.0^e25),rgb(255,0,255));
 DrawEucPoint(0.5^e1 + 0.5^e2 - 0.5^e3,rgb(255,0,0));'''
-    return render_template('main.html', script=script)
+    return render_template('main.html', script=script, show_help = True)
 
 
 @app.route("/interpolate_circles")
@@ -83,7 +83,7 @@ DrawCircle(-(0.3121^e123) - (0.04789^e124) - (0.30467^e125) - (0.42831^e134) + (
 DrawCircle(-(0.25917^e123) - (0.03196^e124) - (0.23993^e125) - (0.56688^e134) + (0.69488^e135) + (0.61049^e145) + (0.03664^e234) - (0.3224^e235) - (0.07367^e245) - (0.60695^e345),rgb(244, 10, 0));
 DrawCircle(-(0.14875^e123) - (0.01632^e124) - (0.13315^e125) - (0.67696^e134) + (0.70956^e135) + (0.68379^e145) + (0.02526^e234) - (0.1755^e235) - (0.04186^e245) - (0.67822^e345),rgb(249, 5, 0));
 DrawCircle(-(0.70711^e134) + (0.70711^e135) + (0.70711^e145) - (0.70711^e345),rgb(255, 0, 0));'''
-    return render_template('main.html', script=script)
+    return render_template('main.html', script=script, show_help=False)
 
 
 @app.route("/cluster_circles")
@@ -121,7 +121,7 @@ DrawCircle((0.05451^e123) + (0.66172^e124) + (0.43241^e125) - (0.05398^e134) + (
 DrawCircle(-(0.92579^e123) - (4.15641^e124) - (4.27513^e125) - (0.37489^e134) - (0.3794^e135) + (0.02786^e145) + (1.8071^e234) + (1.96808^e235) + (0.49097^e245) + (0.0564^e345),rgb(0,0,0));
 DrawCircle((0.05566^e123) + (0.72782^e124) + (0.4971^e125) - (0.04809^e134) - (0.00334^e135) + (0.3857^e145) + (0.10376^e234) + (0.1515^e235) + (1.05429^e245) - (0.12464^e345),rgb(0,0,0));
 DrawCircle((0.0429^e123) + (0.51529^e124) + (0.37667^e125) + (0.12629^e134) + (0.00609^e135) - (1.03559^e145) - (0.11115^e234) - (0.06288^e235) + (0.22063^e245) - (0.1693^e345),rgb(0,0,0));'''
-    return render_template('main.html', script=script)
+    return render_template('main.html', script=script, show_help=False)
 
 
 @app.route("/to_point_pair/",methods=['POST'])

@@ -104,6 +104,10 @@ function hide_overlay(){
     overlay.hide().off();
 }
 
+{% if not show_help %}
+hide_overlay();
+{% endif %}
+
 var defaultScript = `{{ script }}`;
 document.getElementById("scriptTextArea").value = defaultScript;
 
