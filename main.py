@@ -45,6 +45,11 @@ def render_interpolate_planes():
     return render_template('interpolate_planes.html', show_help=False)
 
 
+@app.route("/average_point_pairs")
+def render_average_point_pairs():
+    return render_template('average_point_pairs.html', show_help=False)
+
+
 @app.route("/cluster_circles")
 def render_cluster_circles():
     return render_template('cluster_circles.html', show_help=False)
