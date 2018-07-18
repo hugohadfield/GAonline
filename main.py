@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from flask import Flask, jsonify, json, request, render_template
 import clifford as cf
 from clifford.g3c import *
