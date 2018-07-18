@@ -25,9 +25,24 @@ def render_main():
     return render_template('default.html', show_help = True)
 
 
+@app.route("/interpolate_point_pairs")
+def render_interpolate_point_pairs():
+    return render_template('interpolate_point_pairs.html', show_help=False)
+
+
+@app.route("/interpolate_lines")
+def render_interpolate_lines():
+    return render_template('interpolate_lines.html', show_help=False)
+
+
 @app.route("/interpolate_circles")
 def render_interpolate_circles():
     return render_template('interpolate_circles.html', show_help=False)
+
+
+@app.route("/interpolate_planes")
+def render_interpolate_planes():
+    return render_template('interpolate_planes.html', show_help=False)
 
 
 @app.route("/cluster_circles")
