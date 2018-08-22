@@ -171,8 +171,11 @@ function DrawPointPair(present_blades,draw_color,scene){
         sphere_b.position.set(b[0],b[1],b[2])
         scene.add(sphere_b);
 
+        var line_width = parseFloat(document.getElementById("linewidthArea").value);
+
         var material = new THREE.LineBasicMaterial({
-            color: draw_color
+            color: draw_color,
+            linewidth : line_width
         });
 
         var a_pos = new THREE.Vector3( a[0],a[1],a[2] )
@@ -258,9 +261,12 @@ function DrawLine(present_blades,draw_color,scene){
         console.log(returned_data);
         var direction = MapToAxisSystem(returned_data.direction);
         var point = MapToAxisSystem(returned_data.point);
+
+        var line_width = parseFloat(document.getElementById("linewidthArea").value);
         
         var material = new THREE.LineBasicMaterial({
-            color: draw_color
+            color: draw_color,
+            linewidth : line_width
         });
         var geometry = new THREE.Geometry();
         geometry.vertices.push(
