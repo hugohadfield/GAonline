@@ -315,11 +315,18 @@ function ResetControls(){
     controls.target = new THREE.Vector3();
 }
 
-
 ResetCamera();
 
 var controls = new THREE.OrbitControls( camera, container );
 controls.update();
+
+function ZoomIn(){
+    controls.dollyIn(1.1);
+}
+
+function ZoomOut(){
+    controls.dollyOut(1.1);
+}
 
 function CenterViewBtn(){
     ResetCamera();

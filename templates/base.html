@@ -74,7 +74,10 @@
     <textarea id="scriptTextArea" rows="30" cols="50" style="resize: none;" ></textarea>
     <div>
         Draw axes and floor: <input type="checkbox" id="axesCheck" checked="checked">
-        Line width: <textarea id="linewidthArea" rows="1" cols="2" style="resize: none;"></textarea>
+        Line width: <textarea id="linewidthArea" rows="1" cols="2" style="resize: none;">5</textarea>
+        Zoom:
+        <button onclick="ZoomIn()">+</button>
+        <button onclick="ZoomOut()">-</button>
         <div>
             <button onclick="ParseUserScript()">Execute script</button>
             <button onclick="AnimateUserScript(100.0,0,true)">Animate script</button>
