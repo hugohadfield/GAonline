@@ -228,11 +228,19 @@ function DrawSphere(present_blades,draw_color,scene){
         console.log(returned_data);
         var centre = MapToAxisSystem(returned_data.centre);
         var radius = returned_data.radius;
-        var geometry = new THREE.SphereGeometry( radius, 32, 32 );
-        var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: true} );
+        var geometry = new THREE.SphereGeometry( radius, 64, 64 );
+        var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false, transparent: true, 
+            opacity: 0.1,
+            side: THREE.DoubleSide, 
+            depthWrite: false} );
         var sphere = new THREE.Mesh( geometry, material );
+
+        var material2 = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: true, transparent: true, opacity: 0.05} );
+        var sphere2 = new THREE.Mesh( geometry, material2 );
         sphere.position.set(centre[0],centre[1],centre[2])
+        sphere2.position.set(centre[0],centre[1],centre[2])
         scene.add(sphere);
+        scene.add(sphere2);
     });
 }
 
@@ -246,6 +254,17 @@ function DrawPlane(present_blades,draw_color,scene){
         
         // Add a floor
         var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
+        var material = new THREE.MeshBasicMaterial( { color: draw_color, wireframe: false,
+        transparent: true, 
+            opacity: 0.5,
+            side: THREE.DoubleSide, 
+            depthWrite: false} );
+        var plane = new THREE.Mesh( geometry, material );
+        plane.material.side = THREE.DoubleSide;
+        plane.lookAt(normal[0],normal[1],normal[2]);
+        plane.position.set(position[0],position[1],position[2]);
+        scene.add( plane );
+
         var material = new THREE.MeshBasicMaterial( { color: draw_color, wireframe: true} );
         var plane = new THREE.Mesh( geometry, material );
         plane.material.side = THREE.DoubleSide;
