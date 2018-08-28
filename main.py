@@ -13,6 +13,7 @@ no = -eo
 I3 = e123
 I5 = e12345
 
+
 app = Flask(__name__)
 
 
@@ -27,7 +28,7 @@ def render_main():
 
 @app.route('/<page>')
 def show(page):
-    return render_template('%s.html' % page, show_help=False)
+    return render_template('%s.html' % page, show_help = False)
 
 
 @app.route("/to_point_pair/", methods=['POST'])

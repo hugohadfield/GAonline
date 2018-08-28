@@ -1,6 +1,8 @@
 from cefpython3 import cefpython as cef
 import platform
 import sys
+import json
+
 
 def run_cef_gui(url_target, title):
     check_versions()
@@ -20,4 +22,7 @@ def check_versions():
 
 
 if __name__ == '__main__':
-    run_cef_gui("localhost:5000", "GAOnline")
+    if len(sys.argv) > 1:
+        run_cef_gui("localhost:5000/" + sys.argv[1], "GAOnline")
+    else:
+        run_cef_gui("localhost:5000/" , "GAOnline")

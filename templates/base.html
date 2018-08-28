@@ -113,6 +113,7 @@ hide_overlay();
 {% endif %}
 
 var defaultScript = {% block user_script %}{% endblock %};
+
 document.getElementById("scriptTextArea").value = defaultScript;
 
 function loadFileAsText()
