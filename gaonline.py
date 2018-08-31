@@ -7,6 +7,7 @@ from main import run_app
 from multiprocessing import Process
 from cef_gui import *
 
+import urllib
 
 def generate_template(script_string):
     s_start = """{% extends 'base.html' %}
@@ -31,15 +32,6 @@ def generate_and_save_template(script_string):
     return fullname, filename, endpointname
 
 
-def render_notebook_script(script_string):
-    fullname, filename, endpointname = generate_and_save_template(script_string)
-    print('Booting server')
-    server = Process(target=run_app)
-    time.sleep(1)
-    url = "localhost:5000/" + endpointname
-    return server, url, fullname
-
-
 def end_graphics_server(server, fullname):
     server.terminate()
     server.join()
@@ -47,12 +39,30 @@ def end_graphics_server(server, fullname):
             os.remove(fullname)
 
 
-def render_script(script_string):
+def render_notebook_script(script_string, script_tools=False):
+    fullname, filename, endpointname = generate_and_save_template(script_string)
+    server = Process(target=run_app)
+    server.start()
+    time.sleep(3)
+    if script_tools:
+        params = urllib.parse.urlencode({'show_tools': True})
+    else:
+        params = urllib.parse.urlencode({'show_tools': False})
+    final_url = "http://localhost:5000/" + endpointname + "?%s" % params
+    return server, final_url, fullname
+
+
+def render_script(script_string, script_tools=False):
     # First save the script string as a template
     fullname, filename, endpointname = generate_and_save_template(script_string)
 
     def run_cef_process():
-        run_cef_gui("localhost:5000/" + endpointname, "GAOnline")
+        if script_tools:
+            params = urllib.urlencode({'show_tools': True})
+        else:
+            params = urllib.urlencode({'show_tools': False})
+        final_url = "http://localhost:5000/" + endpointname + "/data?%s" % params
+        run_cef_gui(final_url, "GAOnline")
 
     try:
         # Now run the flask server

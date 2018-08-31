@@ -23,12 +23,17 @@ def as_3D_list(mv_3d):
 
 @app.route("/")
 def render_main():
-    return render_template('default.html', show_help = True)
+    return render_template('default.html', show_help = True, show_tools=True)
 
 
 @app.route('/<page>')
 def show(page):
-    return render_template('%s.html' % page, show_help = False)
+    show_tools_string = request.args.get('show_tools')
+    if show_tools_string == 'True':
+        show_tools = True
+    else:
+        show_tools = False
+    return render_template('%s.html' % page, show_help = False, show_tools=show_tools)
 
 
 @app.route("/to_point_pair/", methods=['POST'])

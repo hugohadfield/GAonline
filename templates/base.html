@@ -71,7 +71,7 @@
 <div sytle="position: fixed; top: 8px; left: 16px;" id="frameCounterText">0</div>
 <div id="scene3d"></div>
 <div style="position: fixed; bottom: 0; left: 0; border: 0;">
-    <textarea id="scriptTextArea" rows="30" cols="50" style="resize: none;" ></textarea>
+    <textarea id="scriptTextArea" rows="0" cols="0" style="resize: none;" ></textarea>
     <div>
         Draw axes and floor: <input type="checkbox" id="axesCheck" checked="checked">
         Line width: <textarea id="linewidthArea" rows="1" cols="2" style="resize: none;">5</textarea>
@@ -79,14 +79,18 @@
         <button onclick="ZoomIn()">+</button>
         <button onclick="ZoomOut()">-</button>
         <div>
+{% if show_tools %}
             <button onclick="ParseUserScript()">Execute script</button>
             <button onclick="AnimateUserScript(100.0,0,true)">Animate script</button>
+{% endif %}
             <button onclick="CenterViewBtn()">Center view</button>
         </div>
+{% if show_tools %}
         <div>
             <td><button onclick="loadFileAsText()">Load File</button><td>
             <input id="fileToLoad" type="file"/>
         </div>
+{% endif %}
     </div>
 </div>
 
