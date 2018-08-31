@@ -109,5 +109,9 @@ def to_circle():
     return jsonify(centre=centre,normal=normal,radius=radius) 
 
 
+def run_app():
+    app.run()
+
+
 if __name__ == '__main__':
   app.run()

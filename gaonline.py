@@ -1,8 +1,9 @@
+from __future__ import print_function
 
 import hashlib
 import os
 import time
-from main import app
+from main import run_app
 from multiprocessing import Process
 from cef_gui import *
 
@@ -30,6 +31,22 @@ def generate_and_save_template(script_string):
     return fullname, filename, endpointname
 
 
+def render_notebook_script(script_string):
+    fullname, filename, endpointname = generate_and_save_template(script_string)
+    print('Booting server')
+    server = Process(target=run_app)
+    time.sleep(1)
+    url = "localhost:5000/" + endpointname
+    return server, url, fullname
+
+
+def end_graphics_server(server, fullname):
+    server.terminate()
+    server.join()
+    if os.path.isfile(fullname):
+            os.remove(fullname)
+
+
 def render_script(script_string):
     # First save the script string as a template
     fullname, filename, endpointname = generate_and_save_template(script_string)
@@ -39,7 +56,7 @@ def render_script(script_string):
 
     try:
         # Now run the flask server
-        server = Process(target=app.run)
+        server = Process(target=run_app)
         cef_gui = Process(target=run_cef_process)
         server.start()
         # Wait a little to warm up
