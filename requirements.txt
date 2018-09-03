@@ -1,6 +1,7 @@
-Flask>=0.12.1
+Flask
+jupyter
 llvmlite
 scipy
 numpy
 numba
-clifford==0.83
+clifford==1.0.0

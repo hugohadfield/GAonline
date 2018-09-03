@@ -58,10 +58,10 @@ def render_script(script_string, script_tools=False):
 
     def run_cef_process():
         if script_tools:
-            params = urllib.urlencode({'show_tools': True})
+            params = urllib.parse.urlencode({'show_tools': True})
         else:
-            params = urllib.urlencode({'show_tools': False})
-        final_url = "http://localhost:5000/" + endpointname + "/data?%s" % params
+            params = urllib.parse.urlencode({'show_tools': False})
+        final_url = "http://localhost:5000/" + endpointname + "?%s" % params
         run_cef_gui(final_url, "GAOnline")
 
     try:
