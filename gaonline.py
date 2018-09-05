@@ -5,7 +5,11 @@ import os
 import time
 from main import run_app
 from multiprocessing import Process
-from cef_gui import *
+
+try:
+    from cef_gui import *
+except:
+    print('Failed to import cef_gui, cef functions will be unavailable')
 
 import urllib
 
