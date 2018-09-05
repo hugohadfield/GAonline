@@ -1,6 +1,7 @@
 Flask
 jupyter
 llvmlite
+cefpython3
 scipy
 numpy
 numba
