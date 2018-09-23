@@ -56,9 +56,12 @@ def render_notebook_script(script_string, script_tools=False):
     return server, final_url, fullname
 
 
-def render_script(script_string, script_tools=False):
+def render_script(script_string="", script_tools=False):
     # First save the script string as a template
-    fullname, filename, endpointname = generate_and_save_template(script_string)
+    if script_string != "":
+        fullname, filename, endpointname = generate_and_save_template(script_string)
+    else:
+        endpointname = ""
 
     def run_cef_process():
         if script_tools:
@@ -81,9 +84,13 @@ def render_script(script_string, script_tools=False):
         server.terminate()
         server.join()
 
-        if os.path.isfile(fullname):
-            os.remove(fullname)
+        if script_string != "":
+            if os.path.isfile(fullname):
+                os.remove(fullname)
     except:
-        if os.path.isfile(fullname):
-            os.remove(fullname)
+        if script_string != "":
+            if os.path.isfile(fullname):
+                os.remove(fullname)
 
+if __name__ == '__main__':
+    render_script()
