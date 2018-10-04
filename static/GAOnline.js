@@ -300,7 +300,7 @@ function DrawLine(present_blades,draw_color,scene){
 function DrawCircle(present_blades,draw_color,scene){
     get_circle(present_blades).success(function (returned_data) {
         console.log(returned_data);
-        var radius = abs(returned_data.radius);
+        var radius = Math.abs(returned_data.radius);
         var centre = MapToAxisSystem(returned_data.centre);
         var normal = MapToAxisSystem(returned_data.normal);
         var imaginary = (returned_data.radius < 0);
