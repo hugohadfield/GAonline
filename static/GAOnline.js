@@ -300,10 +300,12 @@ function DrawLine(present_blades,draw_color,scene){
 function DrawCircle(present_blades,draw_color,scene){
     get_circle(present_blades).success(function (returned_data) {
         console.log(returned_data);
-        var radius = returned_data.radius;
+        var radius = abs(returned_data.radius);
         var centre = MapToAxisSystem(returned_data.centre);
         var normal = MapToAxisSystem(returned_data.normal);
-            
+        var imaginary = (returned_data.radius < 0);
+        // Not sure what to do in the case that we have an imaginary circle
+        // Probably should draw it in a dashed way
         var geometry = new THREE.TorusGeometry( radius, 0.05, 16,32 );
         var material = new THREE.MeshBasicMaterial( { color: draw_color } );
         var torus = new THREE.Mesh( geometry, material );
