@@ -4,8 +4,8 @@ A [flask](http://flask.pocoo.org/), [clifford](https://github.com/pygae/clifford
 Created by [Hugo Hadfield](https://github.com/hugohadfield)
 
 # Use it now
-An Azure deployment of this project can be found here:
-http://gaonline.azurewebsites.net/
+A Heroku deployment of this project can be found here:
+https://gaonline.herokuapp.com/
 
 A tutorial coving basic usage can be found here:
 https://hugohadfield.github.io/GAonline/index.html
