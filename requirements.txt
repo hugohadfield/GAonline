@@ -5,6 +5,4 @@ cefpython3
 scipy
 numpy
 numba
-clifford
-tornado
-virtualenv
+clifford=0.83
