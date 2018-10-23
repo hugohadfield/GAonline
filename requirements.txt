@@ -5,4 +5,5 @@ cefpython3
 scipy
 numpy
 numba
-clifford==1.0.0
+clifford
+tornado
