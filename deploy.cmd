@@ -85,8 +85,6 @@ call :SelectPythonVersion
 
 pushd "%DEPLOYMENT_TARGET%"
 
-python -m pip install --upgrade virtualenv
-
 :: 3. Create virtual environment
 IF NOT EXIST "%DEPLOYMENT_TARGET%\env\azure.env.%PYTHON_RUNTIME%.txt" (
   IF EXIST "%DEPLOYMENT_TARGET%\env" (
