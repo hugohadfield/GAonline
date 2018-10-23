@@ -5,4 +5,4 @@ cefpython3
 scipy
 numpy
 numba
-clifford=v0.83
+clifford
