@@ -78,6 +78,27 @@ function parseScriptToFunctions(str,scene){
     }
 }
 
+function parseJSONFile(str,scene){
+    var obj = JSON.parse(str);
+    console.log(obj);
+}
+
+function get_interpretation(present_blades){
+    return $.ajax({
+                url : "to_interpretted/",
+                type : "POST",
+                data : { 'present_blades' : JSON.stringify(present_blades) } ,
+            });
+}
+
+function get_conformal_point(present_blades){
+    return $.ajax({
+                url : "to_conformal_point/",
+                type : "POST",
+                data : { 'present_blades' : JSON.stringify(present_blades) } ,
+            });
+}
+
 function get_point_pair(present_blades){
     return $.ajax({
                 url : "to_point_pair/",
@@ -153,53 +174,121 @@ function MapToAxisSystem(vectorin){
 }
 
 
+function DrawObject(present_blades,draw_color,scene){
+    get_interpretation(present_blades).success(function (returned_data) {
+        console.log(returned_data);
+        var obj_class = returned_data.obj_flag;
+        switch(obj_class){
+            case 1:
+                renderEucPoint(returned_data, draw_color, scene);
+                break;
+            case 2:
+                renderConfPoint(returned_data, draw_color, scene);
+                break;
+            case 3:
+                renderPointPair(returned_data, draw_color, scene);
+                break;
+            case 4:
+                renderCircle(returned_data, draw_color, scene);
+                break;
+            case 5:
+                renderLine(returned_data, draw_color, scene);
+                break;
+            case 6:
+                renderSphere(returned_data, draw_color, scene);
+                break;
+            case 7:
+                renderPlane(returned_data, draw_color, scene);
+                break;
+        }
+
+    });
+}
+
+
+function renderPointPair(returned_data, draw_color, scene){
+    var a = returned_data.a;
+    var b = returned_data.b;
+    
+    var radius = 0.05;
+    var geometry = new THREE.SphereGeometry( radius, 32, 32 );
+    var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
+    var sphere_a = new THREE.Mesh( geometry, material );
+    sphere_a.position.set(a[0],a[1],a[2])
+    scene.add(sphere_a);
+
+    var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
+    var sphere_b = new THREE.Mesh( geometry, material );
+    sphere_b.position.set(b[0],b[1],b[2])
+    scene.add(sphere_b);
+
+    var line_width = parseFloat(document.getElementById("linewidthArea").value);
+
+    var material = new THREE.LineBasicMaterial({
+        color: draw_color,
+        linewidth : line_width
+    });
+
+    var a_pos = new THREE.Vector3( a[0],a[1],a[2] )
+    var b_pos = new THREE.Vector3( b[0],b[1],b[2] )
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(
+        a_pos,
+        b_pos
+    );
+    var line = new THREE.Line( geometry, material );
+    scene.add( line );
+
+    var geometry = new THREE.ConeGeometry( 2*radius, radius*4, 6 );
+    var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
+    var cone = new THREE.Mesh( geometry, material );
+    var c_pos = a_pos.clone();
+    c_pos.add( b_pos ).multiplyScalar(0.5);
+
+    var axis = new THREE.Vector3(0, 1, 0);
+    cone.quaternion.setFromUnitVectors(axis, b_pos.clone().sub(a_pos).normalize());
+    cone.position.set( c_pos.x, c_pos.y, c_pos.z );
+    scene.add( cone );
+
+}
+
+
 function DrawPointPair(present_blades,draw_color,scene){
     get_point_pair(present_blades).success(function (returned_data) {
         console.log(returned_data);
-        var a = returned_data.a;
-        var b = returned_data.b;
-        
-        var radius = 0.05;
-        var geometry = new THREE.SphereGeometry( radius, 32, 32 );
-        var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
-        var sphere_a = new THREE.Mesh( geometry, material );
-        sphere_a.position.set(a[0],a[1],a[2])
-        scene.add(sphere_a);
-
-        var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
-        var sphere_b = new THREE.Mesh( geometry, material );
-        sphere_b.position.set(b[0],b[1],b[2])
-        scene.add(sphere_b);
-
-        var line_width = parseFloat(document.getElementById("linewidthArea").value);
-
-        var material = new THREE.LineBasicMaterial({
-            color: draw_color,
-            linewidth : line_width
-        });
-
-        var a_pos = new THREE.Vector3( a[0],a[1],a[2] )
-        var b_pos = new THREE.Vector3( b[0],b[1],b[2] )
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push(
-            a_pos,
-            b_pos
-        );
-        var line = new THREE.Line( geometry, material );
-        scene.add( line );
-
-        var geometry = new THREE.ConeGeometry( 2*radius, radius*4, 6 );
-        var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
-        var cone = new THREE.Mesh( geometry, material );
-        var c_pos = a_pos.clone();
-        c_pos.add( b_pos ).multiplyScalar(0.5);
-
-        var axis = new THREE.Vector3(0, 1, 0);
-        cone.quaternion.setFromUnitVectors(axis, b_pos.clone().sub(a_pos).normalize());
-        cone.position.set( c_pos.x, c_pos.y, c_pos.z );
-        scene.add( cone );
-
+        renderPointPair(returned_data, draw_color, scene);
     });
+}
+
+function renderConfPoint(returned_data, draw_color, scene){
+    var p = returned_data.p;
+    var radius = parseFloat(document.getElementById("pointRadius").value);
+    var geometry = new THREE.SphereGeometry( radius, 32, 32 );
+    var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
+    var sphere = new THREE.Mesh( geometry, material );
+
+    sphere.position.set(p[0],p[1],p[2])
+    scene.add(sphere);
+}
+
+
+function DrawConfPoint(present_blades,draw_color,scene){
+    get_conformal_point(present_blades).success(function (returned_data) {
+        console.log(returned_data);
+        renderConfPoint(returned_data, draw_color, scene);
+    });
+}
+
+
+function renderEucPoint(returned_data, draw_color, scene){
+    var p = returned_data.p;
+    var radius = parseFloat(document.getElementById("pointRadius").value);
+    var geometry = new THREE.SphereGeometry( radius, 32, 32 );
+    var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
+    var sphere = new THREE.Mesh( geometry, material );
+
+    sphere.position.set(p[0],p[1],p[2])
+    scene.add(sphere);
 }
 
 
@@ -222,96 +311,120 @@ function DrawEucPoint(present_blades,draw_color,scene){
 }
 
 
+function renderSphere(returned_data, draw_color, scene){
+    var centre = MapToAxisSystem(returned_data.centre);
+    var radius = returned_data.radius;
+    var geometry = new THREE.SphereGeometry( radius, 64, 64 );
+    var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false, transparent: true, 
+        opacity: 0.1,
+        side: THREE.DoubleSide, 
+        depthWrite: false} );
+    var sphere = new THREE.Mesh( geometry, material );
+
+    var material2 = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: true, transparent: true, opacity: 0.05} );
+    var sphere2 = new THREE.Mesh( geometry, material2 );
+    sphere.position.set(centre[0],centre[1],centre[2])
+    sphere2.position.set(centre[0],centre[1],centre[2])
+    scene.add(sphere);
+    scene.add(sphere2);
+}
+
+
+
 function DrawSphere(present_blades,draw_color,scene){
     // Get the sphere parameters and draw it on return
     get_sphere(present_blades).success(function (returned_data) {
         console.log(returned_data);
-        var centre = MapToAxisSystem(returned_data.centre);
-        var radius = returned_data.radius;
-        var geometry = new THREE.SphereGeometry( radius, 64, 64 );
-        var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false, transparent: true, 
-            opacity: 0.1,
-            side: THREE.DoubleSide, 
-            depthWrite: false} );
-        var sphere = new THREE.Mesh( geometry, material );
-
-        var material2 = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: true, transparent: true, opacity: 0.05} );
-        var sphere2 = new THREE.Mesh( geometry, material2 );
-        sphere.position.set(centre[0],centre[1],centre[2])
-        sphere2.position.set(centre[0],centre[1],centre[2])
-        scene.add(sphere);
-        scene.add(sphere2);
+        renderSphere(returned_data, draw_color, scene);
     });
 }
+
+
+
+function renderPlane(returned_data, draw_color, scene){
+    var distance = returned_data.distance;
+    var normal = MapToAxisSystem(returned_data.normal);
+    var position = [normal[0]*distance,normal[1]*distance,normal[2]*distance];
+    
+    // Add a floor
+    var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
+    var material = new THREE.MeshBasicMaterial( { color: draw_color, wireframe: false,
+    transparent: true, 
+        opacity: 0.5,
+        side: THREE.DoubleSide, 
+        depthWrite: false} );
+    var plane = new THREE.Mesh( geometry, material );
+    plane.material.side = THREE.DoubleSide;
+    plane.lookAt(normal[0],normal[1],normal[2]);
+    plane.position.set(position[0],position[1],position[2]);
+    scene.add( plane );
+
+    var material = new THREE.MeshBasicMaterial( { color: draw_color, wireframe: true} );
+    var plane = new THREE.Mesh( geometry, material );
+    plane.material.side = THREE.DoubleSide;
+    plane.lookAt(normal[0],normal[1],normal[2]);
+    plane.position.set(position[0],position[1],position[2]);
+    scene.add( plane );
+}
+
+
 
 function DrawPlane(present_blades,draw_color,scene){
     // Get the sphere parameters and draw it on return
     get_plane(present_blades).success(function (returned_data) {
         console.log(returned_data);
-        var distance = returned_data.distance;
-        var normal = MapToAxisSystem(returned_data.normal);
-        var position = [normal[0]*distance,normal[1]*distance,normal[2]*distance];
-        
-        // Add a floor
-        var geometry = new THREE.PlaneGeometry( 100, 100, 100, 100 );
-        var material = new THREE.MeshBasicMaterial( { color: draw_color, wireframe: false,
-        transparent: true, 
-            opacity: 0.5,
-            side: THREE.DoubleSide, 
-            depthWrite: false} );
-        var plane = new THREE.Mesh( geometry, material );
-        plane.material.side = THREE.DoubleSide;
-        plane.lookAt(normal[0],normal[1],normal[2]);
-        plane.position.set(position[0],position[1],position[2]);
-        scene.add( plane );
-
-        var material = new THREE.MeshBasicMaterial( { color: draw_color, wireframe: true} );
-        var plane = new THREE.Mesh( geometry, material );
-        plane.material.side = THREE.DoubleSide;
-        plane.lookAt(normal[0],normal[1],normal[2]);
-        plane.position.set(position[0],position[1],position[2]);
-        scene.add( plane );
+        renderPlane(returned_data, draw_color, scene);
     });
+}
+
+
+function renderLine(returned_data, draw_color, scene){
+    var direction = MapToAxisSystem(returned_data.direction);
+    var point = MapToAxisSystem(returned_data.point);
+
+    var line_width = parseFloat(document.getElementById("linewidthArea").value);
+    
+    var material = new THREE.LineBasicMaterial({
+        color: draw_color,
+        linewidth : line_width
+    });
+    var geometry = new THREE.Geometry();
+    geometry.vertices.push(
+        new THREE.Vector3( point[0]+500*direction[0], point[1]+500*direction[1], point[2]+500*direction[2] ),
+        new THREE.Vector3( point[0]-500*direction[0], point[1]-500*direction[1], point[2]-500*direction[2] )
+    );
+    var line = new THREE.Line( geometry, material );
+    scene.add( line );
 }
 
 
 function DrawLine(present_blades,draw_color,scene){
     get_line(present_blades).success(function (returned_data) {
         console.log(returned_data);
-        var direction = MapToAxisSystem(returned_data.direction);
-        var point = MapToAxisSystem(returned_data.point);
-
-        var line_width = parseFloat(document.getElementById("linewidthArea").value);
-        
-        var material = new THREE.LineBasicMaterial({
-            color: draw_color,
-            linewidth : line_width
-        });
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push(
-            new THREE.Vector3( point[0]+500*direction[0], point[1]+500*direction[1], point[2]+500*direction[2] ),
-            new THREE.Vector3( point[0]-500*direction[0], point[1]-500*direction[1], point[2]-500*direction[2] )
-        );
-        var line = new THREE.Line( geometry, material );
-        scene.add( line );
+        renderLine(returned_data, draw_color, scene);
     });
 }
+
+function renderCircle(returned_data, draw_color, scene){
+    var radius = Math.abs(returned_data.radius);
+    var centre = MapToAxisSystem(returned_data.centre);
+    var normal = MapToAxisSystem(returned_data.normal);
+    var imaginary = (returned_data.radius < 0);
+    // Not sure what to do in the case that we have an imaginary circle
+    // Probably should draw it in a dashed way
+    var geometry = new THREE.TorusGeometry( radius, 0.05, 16,32 );
+    var material = new THREE.MeshBasicMaterial( { color: draw_color } );
+    var torus = new THREE.Mesh( geometry, material );
+    torus.lookAt(normal[0],normal[1],normal[2]);
+    torus.position.set(centre[0],centre[1],centre[2]);
+    scene.add( torus );
+}
+
 
 function DrawCircle(present_blades,draw_color,scene){
     get_circle(present_blades).success(function (returned_data) {
         console.log(returned_data);
-        var radius = Math.abs(returned_data.radius);
-        var centre = MapToAxisSystem(returned_data.centre);
-        var normal = MapToAxisSystem(returned_data.normal);
-        var imaginary = (returned_data.radius < 0);
-        // Not sure what to do in the case that we have an imaginary circle
-        // Probably should draw it in a dashed way
-        var geometry = new THREE.TorusGeometry( radius, 0.05, 16,32 );
-        var material = new THREE.MeshBasicMaterial( { color: draw_color } );
-        var torus = new THREE.Mesh( geometry, material );
-        torus.lookAt(normal[0],normal[1],normal[2]);
-        torus.position.set(centre[0],centre[1],centre[2]);
-        scene.add( torus );
+        renderCircle(returned_data, draw_color, scene);
     });
 }
 
@@ -398,7 +511,13 @@ function ParseUserScript(){
     var draw_axes = document.getElementById("axesCheck").checked;
     resetScene(scene,draw_axes);
     // Add the new stuff
-    parseScriptToFunctions(input_str,scene);
+    var firstLine = input_str.split('\n')[0];
+    if (input_str == "#json v001"){
+        parseJSONFile(input_str.substring(firstLine.length, input_str.length));
+    }
+    else{
+        parseScriptToFunctions(input_str,scene);        
+    }
 }
 
 // Add a floor

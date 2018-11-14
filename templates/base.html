@@ -71,7 +71,11 @@
 <div sytle="position: fixed; top: 8px; left: 16px;" id="frameCounterText">0</div>
 <div id="scene3d"></div>
 <div style="position: fixed; bottom: 0; left: 0; border: 0;">
-    <textarea id="scriptTextArea" rows="0" cols="0" style="resize: none;" ></textarea>
+    {% if show_tools %}
+        <textarea id="scriptTextArea" rows="30" cols="50" style="resize: none;" ></textarea>
+    {% else %}
+        <textarea id="scriptTextArea" rows="0" cols="0" style="resize: none;" ></textarea>
+    {% endif %}
     <div>
         Draw axes and floor: <input type="checkbox" id="axesCheck" checked="checked">
         Zoom:
@@ -111,7 +115,6 @@ function show_overlay(){
     var overlay = $('#overlay');
     overlay.show().on();
 }
-
 
 function hide_overlay(){
     var overlay = $('#overlay');
