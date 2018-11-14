@@ -204,7 +204,7 @@ function DrawPointPair(present_blades,draw_color,scene){
 
 
 function DrawEucPoint(present_blades,draw_color,scene){
-    var radius = 0.05;
+    var radius = parseFloat(document.getElementById("pointRadius").value);
     var geometry = new THREE.SphereGeometry( radius, 32, 32 );
     var material = new THREE.MeshBasicMaterial( {color: draw_color, wireframe: false} );
     var sphere = new THREE.Mesh( geometry, material );
