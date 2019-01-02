@@ -533,9 +533,8 @@ function resetScene(scene, floor_and_axes_bool){
     // Remove everything from the scene first
     for (let i = scene.children.length - 1; i >= 0; i--) {
         var mesh = scene.children[i];
-        scene.remove(mesh);
         mesh.geometry.dispose();
-        mesh = null;
+        scene.remove(mesh);
     }
     if (floor_and_axes_bool){
         // Build coordinate axes
